@@ -10,7 +10,7 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'w0rp/ale'
 Plug 'lambdalisue/vim-fullscreen'
 Plug 'chandlerc/jellybeans.vim'
-""Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'altercation/vim-colors-solarized'
 Plug 'godlygeek/csapprox'
 Plug 'bfrg/vim-cpp-modern'
@@ -18,25 +18,29 @@ Plug 'CreaturePhil/vim-handmade-hero'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'tomasiser/vim-code-dark'
 Plug 'mg979/vim-studio-dark'
-""Plug 'rhysd/vim-clang-format'
+Plug 'rhysd/vim-clang-format'
 ""Plug 'kana/vim-operator-user'
 Plug 'arakashic/chromatica.nvim'
+Plug 'JesseKPhillips/d.vim'
+Plug 'vim-scripts/Dutyl'
+Plug 'scarface-one/vim-dlang-phobos-highlighter'
+Plug 'vim-scripts/User-Defined-Type-Highlighter'
 call plug#end()
 
 set termguicolors
 set background=dark
 hi Normal ctermbg=none
-colorscheme jellybeans 
+colorscheme gruvbox 
 "colorscheme handmade-hero
 ""colorscheme codedark
 ""colorscheme vsdark
 set autoindent
-set tabstop=4
-set shiftwidth=4
+set tabstop=2
+set shiftwidth=2
 set expandtab
 "autocmd Filetype cpp setlocal tabstop=4
 set number
-set colorcolumn=80
+set colorcolumn=120
 highlight ColorColumn guibg=#2d2d2d ctermbg=4
 
 let NERDTreeIgnor = ['\.o']
@@ -63,6 +67,7 @@ set mouse=a
 
 cmap wq w
 set cino=N-s
+let g:clang_format#detect_style_file = 1
 ""let g:clang_format#style_options = {
 "            \ "AccessModifierOffset" : -4,
 "            \ "AlignOperands" : "true",
@@ -76,13 +81,14 @@ set cino=N-s
 "            \ "UseTab" : "Never",
 "            \ "AlignAfterOpenBracket" : "Align", 
 "            \ "Standard" : "C++11"}
-""let g:clang_format#auto_format=1
-""autocmd FileType cpp ClangFormatAutoEnable
+let g:clang_format#auto_format=1
+autocmd FileType cpp ClangFormatAutoEnable
+autocmd FileType c ClangFormatAutoEnable
 
 "let g:chromatica#libclang_path='/usr/local/Cellar/llvm/7.0.1/lib'
 "let g:chromatica#enable_at_startup=1
+"
 
+let g:udt_recursive = 1
 
-
-
-
+au bufreadpost *.cpp,*.c,*.h call Generate_Highlighting()
