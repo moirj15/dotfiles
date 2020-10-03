@@ -1,4 +1,4 @@
-let g:python3_host_prog='/usr/local/bin/python3'
+"let g:python3_host_prog='/usr/local/bin/python3'
 
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'jonathanfilip/vim-lucius'
@@ -24,7 +24,10 @@ Plug 'arakashic/chromatica.nvim'
 Plug 'JesseKPhillips/d.vim'
 Plug 'vim-scripts/Dutyl'
 Plug 'scarface-one/vim-dlang-phobos-highlighter'
-Plug 'vim-scripts/User-Defined-Type-Highlighter'
+"Plug 'vim-scripts/User-Defined-Type-Highlighter'
+Plug 'neoclide/coc.nvim',  {'branch': 'release'}
+Plug 'jackguo380/vim-lsp-cxx-highlight'
+Plug 'vim-syntastic/syntastic'
 call plug#end()
 
 set termguicolors
@@ -92,3 +95,14 @@ autocmd FileType c ClangFormatAutoEnable
 let g:udt_recursive = 1
 
 au bufreadpost *.cpp,*.c,*.h call Generate_Highlighting()
+
+"language server stuff
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+let g:cpp_class_decl_highlight = 1
+
+let g:syntastic_cpp_checkerse = ['cpplint']
+let g:syntastic_c_checkers = ['cpplint']
+let g:syntastic_cpp_cpplint_exec = 'cpplint'
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
