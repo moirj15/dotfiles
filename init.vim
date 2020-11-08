@@ -7,7 +7,7 @@ Plug 'tikhomirov/vim-glsl'
 Plug 'morhetz/gruvbox'
 Plug 'vim-airline/vim-airline'
 Plug 'jiangmiao/auto-pairs'
-Plug 'w0rp/ale'
+"Plug 'w0rp/ale'
 Plug 'lambdalisue/vim-fullscreen'
 Plug 'chandlerc/jellybeans.vim'
 Plug 'octol/vim-cpp-enhanced-highlight'
@@ -15,7 +15,7 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'godlygeek/csapprox'
 Plug 'bfrg/vim-cpp-modern'
 Plug 'CreaturePhil/vim-handmade-hero'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'tomasiser/vim-code-dark'
 Plug 'mg979/vim-studio-dark'
 Plug 'rhysd/vim-clang-format'
@@ -28,6 +28,8 @@ Plug 'scarface-one/vim-dlang-phobos-highlighter'
 Plug 'neoclide/coc.nvim',  {'branch': 'release'}
 Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'vim-syntastic/syntastic'
+Plug 'Yohannfra/Vim-Goto-Header'
+Plug 'ap/vim-buftabline'
 call plug#end()
 
 set termguicolors
@@ -94,7 +96,7 @@ autocmd FileType c ClangFormatAutoEnable
 
 let g:udt_recursive = 1
 
-au bufreadpost *.cpp,*.c,*.h call Generate_Highlighting()
+"au bufreadpost *.cpp,*.c,*.h call Generate_Highlighting()
 
 "language server stuff
 let g:cpp_class_scope_highlight = 1
@@ -106,3 +108,41 @@ let g:syntastic_c_checkers = ['cpplint']
 let g:syntastic_cpp_cpplint_exec = 'cpplint'
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+
+set cmdheight=2
+set updatetime=300
+"set shortmess += c
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+if exists('*complete_info')
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" nvim-qt
+set guifont=Fira\ Mono:h16"\ Regular
+
+
+" termianl stuff
+if has('nvim')
+  tnoremap <Esc> <C-\><C-n>
+  tnoremap <M-[> <Esc>
+  tnoremap <C-v><Esc> <Esc>
+endif
+
+" switch to header/source file
+nnoremap <F4> :GotoHeaderSwitch <CR>
+
+" buffer tab line
+nnoremap <C-N> :bnext <CR>
+nnoremap <C-P> :bprev <CR>
