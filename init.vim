@@ -10,10 +10,10 @@ Plug 'jiangmiao/auto-pairs'
 "Plug 'w0rp/ale'
 Plug 'lambdalisue/vim-fullscreen'
 Plug 'chandlerc/jellybeans.vim'
-Plug 'octol/vim-cpp-enhanced-highlight'
+"Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'altercation/vim-colors-solarized'
 Plug 'godlygeek/csapprox'
-Plug 'bfrg/vim-cpp-modern'
+"Plug 'bfrg/vim-cpp-modern'
 Plug 'CreaturePhil/vim-handmade-hero'
 "Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'tomasiser/vim-code-dark'
@@ -30,15 +30,19 @@ Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'vim-syntastic/syntastic'
 Plug 'Yohannfra/Vim-Goto-Header'
 Plug 'ap/vim-buftabline'
+Plug 'joshdick/onedark.vim'
+Plug 'rakr/vim-one'
+Plug 'mhinz/vim-startify'
+Plug 'tpope/vim-fugitive'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
 call plug#end()
 
 set termguicolors
 set background=dark
 hi Normal ctermbg=none
 colorscheme gruvbox 
-"colorscheme handmade-hero
-""colorscheme codedark
-""colorscheme vsdark
 set autoindent
 set tabstop=2
 set shiftwidth=2
@@ -49,7 +53,7 @@ set colorcolumn=120
 highlight ColorColumn guibg=#2d2d2d ctermbg=4
 
 let NERDTreeIgnor = ['\.o']
-let g:NERDTreeWinSize=14
+let g:NERDTreeWinSize=25
 set fillchars+=vert:\$
 
 let g:ale_set_highlights = 1
@@ -63,29 +67,11 @@ set hidden
 let g:deoplete#enable_at_startup=1
 
 autocmd Filetype rust setlocal colorcolumn=99
-""let g:cpp_class_scope_highlight = 1
-""let g:cpp_member_variable_highlight = 1
-""let g:cpp_class_decl_highlight = 1
-""
-""let g:cpp_no_function_highlight = 1
 set mouse=a
 
 cmap wq w
 set cino=N-s
 let g:clang_format#detect_style_file = 1
-""let g:clang_format#style_options = {
-"            \ "AccessModifierOffset" : -4,
-"            \ "AlignOperands" : "true",
-"            \ "BreakConstructorInitializers" : "AfterColon",
-"            \ "FixNamespaceComments" : "true",
-"            \ "IndentCaseLabels" : "false",
-"            \ "IndentWidth" : 4,
-"            \ "KeepEmptyLinesAtTheStartOfBlocks" : "false",
-"            \ "NamespaceIndentation" : "None",
-"            \ "PointerAlignment" : "Right",
-"            \ "UseTab" : "Never",
-"            \ "AlignAfterOpenBracket" : "Align", 
-"            \ "Standard" : "C++11"}
 let g:clang_format#auto_format=1
 autocmd FileType cpp ClangFormatAutoEnable
 autocmd FileType c ClangFormatAutoEnable
@@ -128,10 +114,6 @@ if exists('*complete_info')
 else
   inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 endif
-
-" nvim-qt
-set guifont=Fira\ Mono:h16"\ Regular
-
 
 " termianl stuff
 if has('nvim')
