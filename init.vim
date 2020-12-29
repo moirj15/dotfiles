@@ -37,6 +37,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'kien/ctrlp.vim'
 call plug#end()
 
 set termguicolors
@@ -123,8 +124,15 @@ if has('nvim')
 endif
 
 " switch to header/source file
-nnoremap <F4> :GotoHeaderSwitch <CR>
+nnoremap <F4> :CocCommand clangd.switchSourceHeader <CR>
 
 " buffer tab line
 nnoremap <C-N> :bnext <CR>
 nnoremap <C-P> :bprev <CR>
+
+" ctrlp
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]\.(git|hg|svn)|build|include$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
