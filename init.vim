@@ -20,14 +20,14 @@ Plug 'tomasiser/vim-code-dark'
 Plug 'mg979/vim-studio-dark'
 Plug 'rhysd/vim-clang-format'
 ""Plug 'kana/vim-operator-user'
-Plug 'arakashic/chromatica.nvim'
-Plug 'JesseKPhillips/d.vim'
+"Plug 'arakashic/chromatica.nvim'
+"Plug 'JesseKPhillips/d.vim'
 Plug 'vim-scripts/Dutyl'
-Plug 'scarface-one/vim-dlang-phobos-highlighter'
+"Plug 'scarface-one/vim-dlang-phobos-highlighter'
 "Plug 'vim-scripts/User-Defined-Type-Highlighter'
 Plug 'neoclide/coc.nvim',  {'branch': 'release'}
 Plug 'jackguo380/vim-lsp-cxx-highlight'
-Plug 'vim-syntastic/syntastic'
+"Plug 'vim-syntastic/syntastic'
 Plug 'Yohannfra/Vim-Goto-Header'
 Plug 'ap/vim-buftabline'
 Plug 'joshdick/onedark.vim'
@@ -38,12 +38,18 @@ Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'kien/ctrlp.vim'
+Plug 'ackyshake/Spacegray.vim'
+Plug 'lifepillar/vim-gruvbox8'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 call plug#end()
+
+filetype plugin on
+syntax on
+set autoread
 
 set termguicolors
 set background=dark
 hi Normal ctermbg=none
-colorscheme gruvbox 
 set autoindent
 set tabstop=2
 set shiftwidth=2
@@ -60,8 +66,8 @@ set fillchars+=vert:\$
 let g:ale_set_highlights = 1
 let g:ale_sign_column_always=1
 let g:airline#extensions#ale#enabled=1
-let g:ale_cpp_clang_options='-std=c++17 -Wall -Wextra -pedantic -Wno-missing-braces'
-let g:ale_cpp_gcc_options='-std=c++17 -Wall -Wextra -pedantic -Wno-missing-braces'
+let g:ale_cpp_clang_options='-std=c++2a -Wall -Wextra -pedantic -Wno-missing-braces'
+let g:ale_cpp_gcc_options='-std=c++2a -Wall -Wextra -pedantic -Wno-missing-braces'
 let g:ale_c_gcc_options='-std=c11 -Wall -Wextra -pedantic -Wno-missing-braces'
 
 set hidden
@@ -90,13 +96,7 @@ let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
 
-let g:syntastic_cpp_checkerse = ['cpplint']
-let g:syntastic_c_checkers = ['cpplint']
-let g:syntastic_cpp_cpplint_exec = 'cpplint'
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
-set cmdheight=2
+set cmdheight=1
 set updatetime=300
 "set shortmess += c
 inoremap <silent><expr> <TAB>
@@ -136,3 +136,23 @@ let g:ctrlp_custom_ignore = {
   \ 'file': '\v\.(exe|so|dll)$',
   \ 'link': 'some_bad_symbolic_links',
   \ }
+
+let g:lsp_cxx_hl_light_bg = 1
+
+let g:gruvbox_filetype_hi_groups = 1
+let g:gruvbox_plugin_hi_groups = 1
+
+
+colorscheme gruvbox8_hard
+
+if has('nvim')
+    lua <<EOF
+    require'nvim-treesitter.configs'.setup {
+      ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+      highlight = {
+        enable = true,              -- false will disable the whole extension
+        disable = { "c", "rust" },  -- list of language that will be disabled
+      },
+    }
+EOF
+endif
