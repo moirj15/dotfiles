@@ -280,4 +280,3 @@ nmap <silent> gp <Plug>(coc-diagnostic-next)
 
 set undodir=~/.vimdid
 set undofile
-
