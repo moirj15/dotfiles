@@ -1,0 +1,152 @@
+#+STARTUP: overview
+* Bunch of general settings for look/feel
+#+BEGIN_SRC emacs-lisp
+
+  (setq inhibit-splash-screen t)
+  (set-face-attribute 'default nil
+					  :family "Roboto Mono"
+					  :height 150
+					  :weight 'normal
+					  :width 'normal)
+
+  ;; Resize frames using pixel dimensions instead of text cells
+  (setq frame-resize-pixelwise 1)
+  ;; But not for resizing windows, apparently this can cause a crash?
+  (setq window-resize-pixelwise nil)
+
+  (setq-default tab-width 4)
+  (global-linum-mode 1)
+
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+
+  (setq
+   ;; Make sure the window under the mouse is the one scrolled.
+   mouse-wheel-follow-mouse 't
+   ;; Don't do the mouse acceleration stuff
+   mouse-wheel-progressive-speed nil)
+
+  ;; completely disable the stupid bell
+  (setq
+   visible-bell nil
+   ring-bell-function 'ignore)
+
+  ;; No lockfiles plz
+  (setq
+   create-lockfiles nil
+   make-backup-files nil)
+
+  ;; List the buffers with more descriptive names, so if we get the same filename in multiple directories it lists them as dir|filename
+  (require 'uniquify)
+  ;; Use forward slashes to for the above
+  (setq uniquify-buffer-name-style 'forward)
+										  ;(add-to-list 'default-frame-alist '(font . default-font))
+										  ;(set-face-attribute 'default t :font default-font :height 150) 
+  ;; Set up package.el to work with MELPA
+#+END_SRC
+* Rest
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (add-to-list 'package-archives
+				  '("melpa" . "https://melpa.org/packages/"))
+  (package-initialize)
+
+
+  ;; Fun package stuff
+
+  (unless (package-installed-p 'use-package)
+	  (package-refresh-contents)
+	  (package-install 'use-package))
+
+  (use-package org-superstar
+	  :ensure t
+	  :config
+	  (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
+
+  (use-package diminish
+	  :ensure t)
+
+  ;; Shows the possible shortcut combinations 
+  ;;(use-package which-key
+  ;;;;  :diminish which-key-mode
+  ;;  :init
+  ;;  (which-key-mode)
+  ;;  (which-key-setup-minibuffer)
+  ;;  :ensure t)
+
+  ;; vim vim and more vim
+  (use-package evil
+			  :ensure t
+			  :init (evil-mode 1))
+
+  (use-package evil-surround
+	  :config (global-evil-surround-mode 1)
+	  :ensure t)
+
+  (use-package evil-surround
+	  :after evil
+	  :ensure t)
+(evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
+
+
+  ;; Various git things
+  (use-package magit
+	  :ensure t)
+  (use-package git-gutter-fringe
+	  :ensure t
+	  :config
+	  (global-git-gutter-mode))
+
+  ;; Bunch of color themes
+  (setq color-theme-list '(
+							  gruvbox-theme
+							  dracula-theme
+							  warm-night-theme
+							  spacemacs-theme
+							  ))
+
+  (dolist (package color-theme-list)
+	  (unless
+		  (package-installed-p package) (package-install package)))
+  (load-theme 'warm-night t)
+
+  ;; Package for that thing that Doom and spacemaces does with the spacebar
+
+  (use-package general
+	  :config
+	  (general-define-key
+	  :states '(normal motion visual)
+	  :keymaps 'override
+	  :prefix "SPC")
+	  :ensure t)
+
+  ;; Treesitter for syntax highlighting
+  (use-package tree-sitter
+	  :ensure t)
+  (use-package tree-sitter-langs
+	  :ensure t)
+
+  (use-package company
+	  :ensure t
+	  :diminish company-mode)
+
+
+  ;; Lsp setup for nice auto completion and ide like features
+  (use-package lsp-mode
+	  :ensure t)
+  (use-package lsp-ui
+	  :ensure t)
+  (use-package dap-mode
+	  :ensure t)
+  (use-package projectile
+	  :ensure t)
+
+  ;; For trying packages
+  (use-package try
+			  :ensure t)
+
+  (use-package powerline
+	  :ensure t
+	  :config (powerline-default-theme))
+  (setq custom-file "~/.emacs.d/custom.el")
+#+END_SRC
