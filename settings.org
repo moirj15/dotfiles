@@ -2,151 +2,276 @@
 * Bunch of general settings for look/feel
 #+BEGIN_SRC emacs-lisp
 
-  (setq inhibit-splash-screen t)
-  (set-face-attribute 'default nil
-					  :family "Roboto Mono"
-					  :height 150
-					  :weight 'normal
-					  :width 'normal)
+(setq inhibit-splash-screen t)
+(set-face-attribute 'default nil
+					:family "Roboto Mono"
+					:height 150
+					:weight 'normal
+					:width 'normal)
 
-  ;; Resize frames using pixel dimensions instead of text cells
-  (setq frame-resize-pixelwise 1)
-  ;; But not for resizing windows, apparently this can cause a crash?
-  (setq window-resize-pixelwise nil)
+(setq org-edit-src-content-indentation 2)
+(setq org-src-preserve-indentation t)
 
-  (setq-default tab-width 4)
-  (global-linum-mode 1)
+;; Resize frames using pixel dimensions instead of text cells
+(setq frame-resize-pixelwise 1)
+;; But not for resizing windows, apparently this can cause a crash?
+(setq window-resize-pixelwise nil)
 
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
+(setq-default tab-width 4)
+;; Trying with this off for now
+(global-linum-mode 0)
 
-  (setq
-   ;; Make sure the window under the mouse is the one scrolled.
-   mouse-wheel-follow-mouse 't
-   ;; Don't do the mouse acceleration stuff
-   mouse-wheel-progressive-speed nil)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
 
-  ;; completely disable the stupid bell
-  (setq
-   visible-bell nil
-   ring-bell-function 'ignore)
+(setq
+ ;; Make sure the window under the mouse is the one scrolled.
+ mouse-wheel-follow-mouse 't
+ ;; Don't do the mouse acceleration stuff
+ mouse-wheel-progressive-speed nil)
 
-  ;; No lockfiles plz
-  (setq
-   create-lockfiles nil
-   make-backup-files nil)
+;; completely disable the stupid bell
+(setq
+ visible-bell nil
+ ring-bell-function 'ignore)
 
-  ;; List the buffers with more descriptive names, so if we get the same filename in multiple directories it lists them as dir|filename
-  (require 'uniquify)
-  ;; Use forward slashes to for the above
-  (setq uniquify-buffer-name-style 'forward)
-										  ;(add-to-list 'default-frame-alist '(font . default-font))
-										  ;(set-face-attribute 'default t :font default-font :height 150) 
-  ;; Set up package.el to work with MELPA
+;; No lockfiles plz
+(setq
+ create-lockfiles nil
+ make-backup-files nil)
+
+;; List the buffers with more descriptive names, so if we get the same filename in multiple directories it lists them as dir|filename
+(require 'uniquify)
+;; Use forward slashes to for the above
+(setq uniquify-buffer-name-style 'forward)
+										;(add-to-list 'default-frame-alist '(font . default-font))
+										;(set-face-attribute 'default t :font default-font :height 150) 
+;; Set up package.el to work with MELPA
 #+END_SRC
-* Rest
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (add-to-list 'package-archives
-				  '("melpa" . "https://melpa.org/packages/"))
-  (package-initialize)
+* use-package setup
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives
+			 '("melpa" . "https://melpa.org/packages/"))
+(package-initialize)
 
 
-  ;; Fun package stuff
+;; Fun package stuff
 
-  (unless (package-installed-p 'use-package)
-	  (package-refresh-contents)
-	  (package-install 'use-package))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+end_src
+* org-mode
+#+begin_src emacs-lisp
+(use-package org-superstar
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
+#+end_src
+* General evil-mode setup
+#+begin_src emacs-lisp
+;; vim vim and more vim
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-keybinding nil)
+  (evil-mode 1)
+  :config
+  (define-key evil-motion-state-map "\C-u" 'evil-scroll-up))
 
-  (use-package org-superstar
-	  :ensure t
-	  :config
-	  (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
-
-  (use-package diminish
-	  :ensure t)
-
-  ;; Shows the possible shortcut combinations 
-  ;;(use-package which-key
-  ;;;;  :diminish which-key-mode
-  ;;  :init
-  ;;  (which-key-mode)
-  ;;  (which-key-setup-minibuffer)
-  ;;  :ensure t)
-
-  ;; vim vim and more vim
-  (use-package evil
-			  :ensure t
-			  :init (evil-mode 1))
-
-  (use-package evil-surround
-	  :config (global-evil-surround-mode 1)
-	  :ensure t)
-
-  (use-package evil-surround
-	  :after evil
-	  :ensure t)
 (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
 
+(use-package evil-surround
+  :config (global-evil-surround-mode 1)
+  :ensure t)
 
-  ;; Various git things
-  (use-package magit
-	  :ensure t)
-  (use-package git-gutter-fringe
-	  :ensure t
-	  :config
-	  (global-git-gutter-mode))
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
+#+end_src
+* Appearance
+#+begin_src emacs-lisp
+;; Bunch of color themes
+(setq color-theme-list '(
+						 gruvbox-theme
+						 dracula-theme
+						 warm-night-theme
+						 spacemacs-theme
+						 solarized-theme
+						 ))
 
-  ;; Bunch of color themes
-  (setq color-theme-list '(
-							  gruvbox-theme
-							  dracula-theme
-							  warm-night-theme
-							  spacemacs-theme
-							  ))
+(dolist (package color-theme-list)
+  (unless
+	  (package-installed-p package) (package-install package)))
+(load-theme 'solarized-light t)
+#+end_src
+* Git
+#+begin_src emacs-lisp
+;; Various git things
+(use-package magit
+  :ensure t)
+(use-package git-gutter-fringe
+  :ensure t
+  :config
+  (global-git-gutter-mode))
+#+end_src
+* LSP and Project Packages
 
-  (dolist (package color-theme-list)
-	  (unless
-		  (package-installed-p package) (package-install package)))
-  (load-theme 'warm-night t)
+#+begin_src emacs-lisp
+;; Lsp setup for nice auto completion and ide like features
+(use-package lsp-mode
+  :ensure t
+  :init
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
 
-  ;; Package for that thing that Doom and spacemaces does with the spacebar
+(use-package lsp-ui
+  :ensure t
+  :config
+  (setq lsp-ui-doc-enable t)
+  ;;(setq lsp-ui-doc-show-with-cursor t)
+  (setq lsp-ui-doc-show-with-mouse t))
 
-  (use-package general
-	  :config
-	  (general-define-key
-	  :states '(normal motion visual)
-	  :keymaps 'override
-	  :prefix "SPC")
-	  :ensure t)
+(use-package dap-mode
+  :ensure t)
 
-  ;; Treesitter for syntax highlighting
-  (use-package tree-sitter
-	  :ensure t)
-  (use-package tree-sitter-langs
-	  :ensure t)
+(use-package counsel
+  :ensure t)
 
-  (use-package company
-	  :ensure t
-	  :diminish company-mode)
+(use-package company
+  :ensure t
+  :diminish company-mode)
+
+(use-package flycheck
+  :ensure t)
+
+(use-package projectile
+  :ensure t)
+
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
+
+(setq gc-cons-threshold (* 100 1024 1024)
+	  read-process-output-max (* 1024 1024)
+	  company-idle-delay 0.0
+	  company-minimum-prefix-length 1
+	  lsp-idle-delay 0.1)
+#+end_src
+
+* Keyboard Mapping
+
+#+begin_src emacs-lisp
+;; Shows the possible shortcut combinations 
+(use-package which-key
+  :diminish which-key-mode
+  :init
+  (which-key-mode)
+  (which-key-setup-minibuffer)
+  :ensure t
+  :config
+  (setq which-key-idle-delay 0.3
+		which-key-sort-order 'which-key-key-order-alpha))
+
+(use-package general
+  :config
+  (general-define-key
+   :states '(normal motion visual)
+   :keymaps 'override
+   :prefix "SPC"
+
+   ;; Buffers
+   "b" '(nil :which-key "buffer")
+   "bb" '(counsel-switch-buffer :which-key "switch buffers")
+   "bd" '(evil-delete-buffer :which-key "delete buffer")
+
+   "c" '(nil :which-key "code")
+   "cd" '(lsp-ui-doc-glance :which-key "show documentation")
+   "ce" '(lsp-treemacs-errors-list :which-key "show errors")
+   "cf" '(nil :which-key "find")
+   "cfd" '(lsp-ui-peek-find-definitions :which-key "find definition")
+   "cfr" '(lsp-ui-peek-find-references :which-key "find references")
+   "cr" '(lsp-rename :which-key "rename")
+   
+   "f" '(nil :which-key "file")
+   "fb" '(counsel-bookmark :which-key "bookmarks")
+   "ff" '(counsel-find-file :which-key "find file")
+   "fr" '(counsel-recentf :which-key "recent files")
+   "fR" '(rename-file :which-key "rename file")
+   "fs" '(save-buffer :which-key "save buffer")
+   "fS" '(evil-write-all :which-key "save all buffers")
+
+   "g" '(nil :which-key "git")
+   "gs" '(magit-status :which-key "git status")
+
+   "o" '(nil :which-key "open")
+   "os" '(eshell :which-key "open shell")
+   "of" '(make-frame :which-key "open frame")
+
+   "p" '(nil :which-key "project")
+   "pc" '(projectile-compile-project :which-key "compile project")
+   "pk" '(projectile-configure-project :which-key "configure project")
+   "psp" '(projectile-switch-project :which-key "switch project")
+   "pf" '(projectile-find-file :which-key "find file")
+   "pod" '(projectile-dired :which-key "open in dired")
+
+   ;; Windows
+   "w" '(nil :which-key "window")
+   "wN" '(make-frame :which-key "make frame")
+   "wv" '(evil-window-vsplit :which-key "vertical split")
+   "ws" '(evil-window-split :which-key "horizontal split")
+   "wd" '(evil-window-delete :which-key "delete window")
+   "wl" '(evil-window-right :which-key "evil-window-right")
+   "wh" '(evil-window-left :which-key "evil-window-left")
+   "wj" '(evil-window-down :which-key "evil-window-down")
+   "wk" '(evil-window-up :which-key "evil-window-up")
+   "wz" '(text-scale-adjust :which-key "text zoom")
+
+   )
+  :ensure t)
+#+end_src
+
+* Rest
+#+BEGIN_SRC emacs-lisp
 
 
-  ;; Lsp setup for nice auto completion and ide like features
-  (use-package lsp-mode
-	  :ensure t)
-  (use-package lsp-ui
-	  :ensure t)
-  (use-package dap-mode
-	  :ensure t)
-  (use-package projectile
-	  :ensure t)
+(use-package diminish
+  :ensure t)
 
-  ;; For trying packages
-  (use-package try
-			  :ensure t)
 
-  (use-package powerline
-	  :ensure t
-	  :config (powerline-default-theme))
-  (setq custom-file "~/.emacs.d/custom.el")
+
+
+
+
+;; Package for that thing that Doom and spacemaces does with the spacebar
+
+
+;; Treesitter for syntax highlighting
+(use-package tree-sitter
+  :ensure t)
+(use-package tree-sitter-langs
+  :ensure t)
+
+(global-tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+
+;; For trying packages
+(use-package try
+  :ensure t)
+
+(use-package powerline
+  :ensure t
+  :config (powerline-default-theme))
+(setq custom-file "~/.emacs.d/custom.el")
 #+END_SRC
+
+* C/C++ behavior
+#+begin_src emacs-lisp
+
+(setq c-default-style "linux"
+	  c-basic-offset 4)
+
+
+#+end_src
