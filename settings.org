@@ -148,7 +148,14 @@
   :ensure t)
 
 (use-package projectile
-  :ensure t)
+  :ensure t
+  :init
+  (setq-default
+   projectile-cache-file (expand-file-name ".projectile-cache" user-emacs-directory)
+   projectile-known-projects-file (expand-file-name ".projectile-bookmarks" user-emacs-directory))
+  :custom (projectile-enable-caching t))
+(projectile-mode)
+
 
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
@@ -215,6 +222,7 @@
    "psp" '(projectile-switch-project :which-key "switch project")
    "pf" '(projectile-find-file :which-key "find file")
    "pod" '(projectile-dired :which-key "open in dired")
+   "pr" '(projectile-run-project :which-key "run project")
 
    ;; Windows
    "w" '(nil :which-key "window")
@@ -272,6 +280,29 @@
 
 (setq c-default-style "linux"
 	  c-basic-offset 4)
+
+(use-package clang-format
+  :ensure t)
+
+(defun clang-format-save-hook-for-this-buffer ()
+  "Create a buffer local save hook."
+  (add-hook 'before-save-hook
+            (lambda ()
+              (when (locate-dominating-file "." ".clang-format")
+                (clang-format-buffer))
+              ;; Continue to save.
+              nil)
+            nil
+            ;; Buffer local hook.
+            t))
+
+;; Run this for each mode you want to use the hook.
+(add-hook 'c-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
+(add-hook 'c++-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
+(add-hook 'glsl-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
+
+(use-package cmake-mode
+  :ensure t)
 
 
 #+end_src
