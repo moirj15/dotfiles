@@ -1,5 +1,23 @@
 {
-    "clangd.enabled": true,
-    "clangd.semanticHighlighting": true,
-    "clangd.path": "/home/moirj15/.config/coc/extensions/coc-clangd-data/install/12.0.1/clangd_12.0.1/bin/clangd"
+  "languageserver": {
+        "zls" : {
+            "command": "zls",
+            "filetypes": ["zig"]
+        },
+        "coc-clangd" : {
+            "command": "coc-clangd",
+            "filetypes": ["c, cc"],
+            "arguments": [
+                "-Wno-unused-variable",
+                "-Wno-infinite-recursion",
+                "-Werror=implicit-function-declaration",
+                "-Wshadow",
+                "-Wno-shadow-field-in-constructor-modified",
+                "-Wno-shadow-ivar",
+                "-Wuninitialized",
+                "-Wunused-label",
+                "-Wunused-lambda-capture"
+            ]
+        }
+  }
 }

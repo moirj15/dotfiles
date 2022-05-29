@@ -19,7 +19,6 @@ Plug 'rhysd/vim-clang-format'
 Plug 'vim-scripts/Dutyl'
 Plug 'neoclide/coc.nvim',  {'branch': 'release'}
 Plug 'jackguo380/vim-lsp-cxx-highlight'
-Plug 'ap/vim-buftabline'
 Plug 'joshdick/onedark.vim'
 Plug 'rakr/vim-one'
 Plug 'mhinz/vim-startify'
@@ -39,14 +38,14 @@ Plug 'skywind3000/asyncrun.vim'
 "Plug 'cdelledonne/vim-cmake'
 Plug 'airblade/vim-rooter'
 
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'voldikss/vim-floaterm'
 Plug 'Shatur/neovim-cmake'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'mfussenegger/nvim-dap'
 
-Plug 'romgrk/barbar.nvim'
+"Plug 'romgrk/barbar.nvim'
 Plug 'tomasr/molokai'
 Plug 'rafi/awesome-vim-colorschemes'
 call plug#end()
@@ -146,7 +145,7 @@ let g:gruvbox_filetype_hi_groups = 1
 let g:gruvbox_plugin_hi_groups = 1
 
 
-colorscheme gruvbox8_hard
+colorscheme gruvbox8
 
 if has('nvim')
     lua <<EOF
@@ -154,7 +153,6 @@ if has('nvim')
       ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
       highlight = {
         enable = true,              -- false will disable the whole extension
-        disable = { "c", "rust" },  -- list of language that will be disabled
       },
     }
     require('telescope').setup {
@@ -286,7 +284,6 @@ nnoremap <Leader>bn :BufferNext<CR>
 nnoremap <Leader>bp :BufferPrevious<CR>
 nnoremap <Leader>bc :BufferClose<CR>
 
-let bufferline.exclude_ft = ['qf']
-
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader><leader> <cmd>Telescope live_grep<cr>
+
