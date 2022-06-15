@@ -145,10 +145,11 @@ let g:gruvbox_filetype_hi_groups = 1
 let g:gruvbox_plugin_hi_groups = 1
 
 
-colorscheme gruvbox8
+colorscheme hybrid
+set background=dark
 
 if has('nvim')
-    lua <<EOF
+lua <<EOF
     require'nvim-treesitter.configs'.setup {
       ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
       highlight = {
@@ -160,6 +161,9 @@ if has('nvim')
             file_ignore_patterns = {"^buid/", "^.git/", "%.so"}
         }
     }
+    --require('cmake').setup {
+    --    parameters_file = '.nvim.json'
+    --}
 EOF
 endif
 
@@ -280,9 +284,9 @@ let g:floaterm_keymap_toggle = '<Leader>ft'
 nnoremap <Leader>ft :FloatermToggle<CR>
 nnoremap <Leader>c :CMake build<CR>
 
-nnoremap <Leader>bn :BufferNext<CR>
-nnoremap <Leader>bp :BufferPrevious<CR>
-nnoremap <Leader>bc :BufferClose<CR>
+nnoremap <Leader>bb :Buffers<CR>
+nnoremap <Leader>bd :bd<CR>
+
 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader><leader> <cmd>Telescope live_grep<cr>

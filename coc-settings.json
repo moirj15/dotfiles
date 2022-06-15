@@ -5,7 +5,7 @@
             "filetypes": ["zig"]
         },
         "coc-clangd" : {
-            "command": "coc-clangd",
+            "command": "clangd",
             "filetypes": ["c, cc"],
             "arguments": [
                 "-Wno-unused-variable",
@@ -17,7 +17,9 @@
                 "-Wuninitialized",
                 "-Wunused-label",
                 "-Wunused-lambda-capture"
-            ]
+            ],
+            "rootPatterns": ["compile_commands.txt"],
+            "inlayHints.disable": true
         }
   }
 }

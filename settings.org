@@ -4,7 +4,7 @@
 
 (setq inhibit-splash-screen t)
 (set-face-attribute 'default nil
-					:family "Roboto Mono"
+					:family "Consolas"
 					:height 150
 					:weight 'normal
 					:width 'normal)
@@ -101,12 +101,34 @@
 						 warm-night-theme
 						 spacemacs-theme
 						 solarized-theme
+						 vs-light-theme
+						 vscode-dark-plus-theme
 						 ))
 
 (dolist (package color-theme-list)
   (unless
 	  (package-installed-p package) (package-install package)))
-(load-theme 'solarized-light t)
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  ;(setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+(load-theme 'vscode-dark-plus t)
+
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
 #+end_src
 * Git
 #+begin_src emacs-lisp
@@ -160,11 +182,14 @@
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
 
-(setq gc-cons-threshold (* 100 1024 1024)
-	  read-process-output-max (* 1024 1024)
-	  company-idle-delay 0.0
-	  company-minimum-prefix-length 1
-	  lsp-idle-delay 0.1)
+(setq gc-cons-threshold most-positive-fixnum)
+(add-hook 'emacs-startup-hook
+		  (lambda ()
+			(setq gc-cons-threshold (* 50 1024 1024)
+				  read-process-output-max (* 1024 1024)
+				  company-idle-delay 0.0
+				  company-minimum-prefix-length 1
+				  lsp-idle-delay 0.1)))
 #+end_src
 
 * Keyboard Mapping
@@ -304,5 +329,27 @@
 (use-package cmake-mode
   :ensure t)
 
+;; stolen from https://stackoverflow.com/questions/17659212/dont-display-compilation-buffer-in-emacs-until-the-process-exits-with-error-o/17788551#17788551
+(defun brian-compile-finish (buffer outstr)
+  (unless (string-match "finished" outstr)
+    (switch-to-buffer-other-window buffer))
+  t)
+
+(setq compilation-finish-functions 'brian-compile-finish)
+
+(defadvice compilation-start
+  (around inhibit-display
+      (command &optional mode name-function highlight-regexp))
+  (if (not (string-match "^\\(find\\|grep\\)" command))
+      (cl-letf ((display-buffer   #'ignore)
+                (set-window-point #'ignoreco)
+                (goto-char        #'ignore))
+        (save-window-excursion
+          ad-do-it))
+    ad-do-it))
+
+(ad-activate 'compilation-start)
+
+(provide 'only-display-compile-on-error)
 
 #+end_src
