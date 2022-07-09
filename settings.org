@@ -4,7 +4,7 @@
 
 (setq inhibit-splash-screen t)
 (set-face-attribute 'default nil
-					:family "Consolas"
+					:family "Roboto Mono"
 					:height 150
 					:weight 'normal
 					:width 'normal)
@@ -18,8 +18,9 @@
 (setq window-resize-pixelwise nil)
 
 (setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
 ;; Trying with this off for now
-(global-linum-mode 0)
+(global-linum-mode 1)
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
@@ -124,7 +125,7 @@
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
-(load-theme 'vscode-dark-plus t)
+(load-theme 'doom-spacegrey t)
 
 (use-package all-the-icons
   :ensure t
@@ -190,6 +191,10 @@
 				  company-idle-delay 0.0
 				  company-minimum-prefix-length 1
 				  lsp-idle-delay 0.1)))
+(use-package treemacs
+  :ensure t
+  :defer t
+  
 #+end_src
 
 * Keyboard Mapping
@@ -352,4 +357,16 @@
 
 (provide 'only-display-compile-on-error)
 
+#+end_src
+
+
+
+#+begin_src emacs-lisp
+
+(use-package rust-mode
+  :ensure t)
+(setq rust-format-on-save t)
+(add-hook 'rust-mode-hook
+          (lambda () (prettify-symbols-mode)))
+(add-hook 'rust-mode-hook #'lsp)
 #+end_src
