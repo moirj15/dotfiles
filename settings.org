@@ -1,0 +1,372 @@
+#+STARTUP: overview
+* Bunch of general settings for look/feel
+#+BEGIN_SRC emacs-lisp
+
+(setq inhibit-splash-screen t)
+(set-face-attribute 'default nil
+					:family "Roboto Mono"
+					:height 150
+					:weight 'normal
+					:width 'normal)
+
+(setq org-edit-src-content-indentation 2)
+(setq org-src-preserve-indentation t)
+
+;; Resize frames using pixel dimensions instead of text cells
+(setq frame-resize-pixelwise 1)
+;; But not for resizing windows, apparently this can cause a crash?
+(setq window-resize-pixelwise nil)
+
+(setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
+;; Trying with this off for now
+(global-linum-mode 1)
+
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+
+(setq
+ ;; Make sure the window under the mouse is the one scrolled.
+ mouse-wheel-follow-mouse 't
+ ;; Don't do the mouse acceleration stuff
+ mouse-wheel-progressive-speed nil)
+
+;; completely disable the stupid bell
+(setq
+ visible-bell nil
+ ring-bell-function 'ignore)
+
+;; No lockfiles plz
+(setq
+ create-lockfiles nil
+ make-backup-files nil)
+
+;; List the buffers with more descriptive names, so if we get the same filename in multiple directories it lists them as dir|filename
+(require 'uniquify)
+;; Use forward slashes to for the above
+(setq uniquify-buffer-name-style 'forward)
+										;(add-to-list 'default-frame-alist '(font . default-font))
+										;(set-face-attribute 'default t :font default-font :height 150) 
+;; Set up package.el to work with MELPA
+#+END_SRC
+* use-package setup
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives
+			 '("melpa" . "https://melpa.org/packages/"))
+(package-initialize)
+
+
+;; Fun package stuff
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+end_src
+* org-mode
+#+begin_src emacs-lisp
+(use-package org-superstar
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
+#+end_src
+* General evil-mode setup
+#+begin_src emacs-lisp
+;; vim vim and more vim
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-keybinding nil)
+  (evil-mode 1)
+  :config
+  (define-key evil-motion-state-map "\C-u" 'evil-scroll-up))
+
+(evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
+
+(use-package evil-surround
+  :config (global-evil-surround-mode 1)
+  :ensure t)
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
+#+end_src
+* Appearance
+#+begin_src emacs-lisp
+;; Bunch of color themes
+(setq color-theme-list '(
+						 gruvbox-theme
+						 dracula-theme
+						 warm-night-theme
+						 spacemacs-theme
+						 solarized-theme
+						 vs-light-theme
+						 vscode-dark-plus-theme
+						 ))
+
+(dolist (package color-theme-list)
+  (unless
+	  (package-installed-p package) (package-install package)))
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  ;(setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+(load-theme 'doom-spacegrey t)
+
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+#+end_src
+* Git
+#+begin_src emacs-lisp
+;; Various git things
+(use-package magit
+  :ensure t)
+(use-package git-gutter-fringe
+  :ensure t
+  :config
+  (global-git-gutter-mode))
+#+end_src
+* LSP and Project Packages
+
+#+begin_src emacs-lisp
+;; Lsp setup for nice auto completion and ide like features
+(use-package lsp-mode
+  :ensure t
+  :init
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
+
+(use-package lsp-ui
+  :ensure t
+  :config
+  (setq lsp-ui-doc-enable t)
+  ;;(setq lsp-ui-doc-show-with-cursor t)
+  (setq lsp-ui-doc-show-with-mouse t))
+
+(use-package dap-mode
+  :ensure t)
+
+(use-package counsel
+  :ensure t)
+
+(use-package company
+  :ensure t
+  :diminish company-mode)
+
+(use-package flycheck
+  :ensure t)
+
+(use-package projectile
+  :ensure t
+  :init
+  (setq-default
+   projectile-cache-file (expand-file-name ".projectile-cache" user-emacs-directory)
+   projectile-known-projects-file (expand-file-name ".projectile-bookmarks" user-emacs-directory))
+  :custom (projectile-enable-caching t))
+(projectile-mode)
+
+
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
+
+(setq gc-cons-threshold most-positive-fixnum)
+(add-hook 'emacs-startup-hook
+		  (lambda ()
+			(setq gc-cons-threshold (* 50 1024 1024)
+				  read-process-output-max (* 1024 1024)
+				  company-idle-delay 0.0
+				  company-minimum-prefix-length 1
+				  lsp-idle-delay 0.1)))
+(use-package treemacs
+  :ensure t
+  :defer t
+  
+#+end_src
+
+* Keyboard Mapping
+
+#+begin_src emacs-lisp
+;; Shows the possible shortcut combinations 
+(use-package which-key
+  :diminish which-key-mode
+  :init
+  (which-key-mode)
+  (which-key-setup-minibuffer)
+  :ensure t
+  :config
+  (setq which-key-idle-delay 0.3
+		which-key-sort-order 'which-key-key-order-alpha))
+
+(use-package general
+  :config
+  (general-define-key
+   :states '(normal motion visual)
+   :keymaps 'override
+   :prefix "SPC"
+
+   ;; Buffers
+   "b" '(nil :which-key "buffer")
+   "bb" '(counsel-switch-buffer :which-key "switch buffers")
+   "bd" '(evil-delete-buffer :which-key "delete buffer")
+
+   "c" '(nil :which-key "code")
+   "cd" '(lsp-ui-doc-glance :which-key "show documentation")
+   "ce" '(lsp-treemacs-errors-list :which-key "show errors")
+   "cf" '(nil :which-key "find")
+   "cfd" '(lsp-ui-peek-find-definitions :which-key "find definition")
+   "cfr" '(lsp-ui-peek-find-references :which-key "find references")
+   "cr" '(lsp-rename :which-key "rename")
+   
+   "f" '(nil :which-key "file")
+   "fb" '(counsel-bookmark :which-key "bookmarks")
+   "ff" '(counsel-find-file :which-key "find file")
+   "fr" '(counsel-recentf :which-key "recent files")
+   "fR" '(rename-file :which-key "rename file")
+   "fs" '(save-buffer :which-key "save buffer")
+   "fS" '(evil-write-all :which-key "save all buffers")
+
+   "g" '(nil :which-key "git")
+   "gs" '(magit-status :which-key "git status")
+
+   "o" '(nil :which-key "open")
+   "os" '(eshell :which-key "open shell")
+   "of" '(make-frame :which-key "open frame")
+
+   "p" '(nil :which-key "project")
+   "pc" '(projectile-compile-project :which-key "compile project")
+   "pk" '(projectile-configure-project :which-key "configure project")
+   "psp" '(projectile-switch-project :which-key "switch project")
+   "pf" '(projectile-find-file :which-key "find file")
+   "pod" '(projectile-dired :which-key "open in dired")
+   "pr" '(projectile-run-project :which-key "run project")
+
+   ;; Windows
+   "w" '(nil :which-key "window")
+   "wN" '(make-frame :which-key "make frame")
+   "wv" '(evil-window-vsplit :which-key "vertical split")
+   "ws" '(evil-window-split :which-key "horizontal split")
+   "wd" '(evil-window-delete :which-key "delete window")
+   "wl" '(evil-window-right :which-key "evil-window-right")
+   "wh" '(evil-window-left :which-key "evil-window-left")
+   "wj" '(evil-window-down :which-key "evil-window-down")
+   "wk" '(evil-window-up :which-key "evil-window-up")
+   "wz" '(text-scale-adjust :which-key "text zoom")
+
+   )
+  :ensure t)
+#+end_src
+
+* Rest
+#+BEGIN_SRC emacs-lisp
+
+
+(use-package diminish
+  :ensure t)
+
+
+
+
+
+
+;; Package for that thing that Doom and spacemaces does with the spacebar
+
+
+;; Treesitter for syntax highlighting
+(use-package tree-sitter
+  :ensure t)
+(use-package tree-sitter-langs
+  :ensure t)
+
+(global-tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+
+;; For trying packages
+(use-package try
+  :ensure t)
+
+(use-package powerline
+  :ensure t
+  :config (powerline-default-theme))
+(setq custom-file "~/.emacs.d/custom.el")
+#+END_SRC
+
+* C/C++ behavior
+#+begin_src emacs-lisp
+
+(setq c-default-style "linux"
+	  c-basic-offset 4)
+
+(use-package clang-format
+  :ensure t)
+
+(defun clang-format-save-hook-for-this-buffer ()
+  "Create a buffer local save hook."
+  (add-hook 'before-save-hook
+            (lambda ()
+              (when (locate-dominating-file "." ".clang-format")
+                (clang-format-buffer))
+              ;; Continue to save.
+              nil)
+            nil
+            ;; Buffer local hook.
+            t))
+
+;; Run this for each mode you want to use the hook.
+(add-hook 'c-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
+(add-hook 'c++-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
+(add-hook 'glsl-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
+
+(use-package cmake-mode
+  :ensure t)
+
+;; stolen from https://stackoverflow.com/questions/17659212/dont-display-compilation-buffer-in-emacs-until-the-process-exits-with-error-o/17788551#17788551
+(defun brian-compile-finish (buffer outstr)
+  (unless (string-match "finished" outstr)
+    (switch-to-buffer-other-window buffer))
+  t)
+
+(setq compilation-finish-functions 'brian-compile-finish)
+
+(defadvice compilation-start
+  (around inhibit-display
+      (command &optional mode name-function highlight-regexp))
+  (if (not (string-match "^\\(find\\|grep\\)" command))
+      (cl-letf ((display-buffer   #'ignore)
+                (set-window-point #'ignoreco)
+                (goto-char        #'ignore))
+        (save-window-excursion
+          ad-do-it))
+    ad-do-it))
+
+(ad-activate 'compilation-start)
+
+(provide 'only-display-compile-on-error)
+
+#+end_src
+
+
+
+#+begin_src emacs-lisp
+
+(use-package rust-mode
+  :ensure t)
+(setq rust-format-on-save t)
+(add-hook 'rust-mode-hook
+          (lambda () (prettify-symbols-mode)))
+(add-hook 'rust-mode-hook #'lsp)
+#+end_src

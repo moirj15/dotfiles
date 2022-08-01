@@ -7,29 +7,18 @@ Plug 'tikhomirov/vim-glsl'
 Plug 'morhetz/gruvbox'
 Plug 'vim-airline/vim-airline'
 Plug 'jiangmiao/auto-pairs'
-"Plug 'w0rp/ale'
 Plug 'lambdalisue/vim-fullscreen'
 Plug 'chandlerc/jellybeans.vim'
-"Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'altercation/vim-colors-solarized'
 Plug 'godlygeek/csapprox'
-"Plug 'bfrg/vim-cpp-modern'
 Plug 'CreaturePhil/vim-handmade-hero'
-"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'tomasiser/vim-code-dark'
 Plug 'mg979/vim-studio-dark'
 Plug 'rhysd/vim-clang-format'
-""Plug 'kana/vim-operator-user'
-"Plug 'arakashic/chromatica.nvim'
 "Plug 'JesseKPhillips/d.vim'
 Plug 'vim-scripts/Dutyl'
-"Plug 'scarface-one/vim-dlang-phobos-highlighter'
-"Plug 'vim-scripts/User-Defined-Type-Highlighter'
 Plug 'neoclide/coc.nvim',  {'branch': 'release'}
 Plug 'jackguo380/vim-lsp-cxx-highlight'
-"Plug 'vim-syntastic/syntastic'
-"Plug 'Yohannfra/Vim-Goto-Header'
-Plug 'ap/vim-buftabline'
 Plug 'joshdick/onedark.vim'
 Plug 'rakr/vim-one'
 Plug 'mhinz/vim-startify'
@@ -46,12 +35,19 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'rust-lang/rust.vim'
 "Plug 'puremourning/vimspector'
 Plug 'skywind3000/asyncrun.vim'
-Plug 'cdelledonne/vim-cmake'
+"Plug 'cdelledonne/vim-cmake'
 Plug 'airblade/vim-rooter'
 
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'voldikss/vim-floaterm'
+Plug 'Shatur/neovim-cmake'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'mfussenegger/nvim-dap'
 
+"Plug 'romgrk/barbar.nvim'
+Plug 'tomasr/molokai'
+Plug 'rafi/awesome-vim-colorschemes'
 call plug#end()
 
 filetype plugin on
@@ -94,13 +90,8 @@ let g:clang_format#auto_format=1
 autocmd FileType cpp ClangFormatAutoEnable
 autocmd FileType c ClangFormatAutoEnable
 
-"let g:chromatica#libclang_path='/usr/local/Cellar/llvm/7.0.1/lib'
-"let g:chromatica#enable_at_startup=1
-"
-
 let g:udt_recursive = 1
 
-"au bufreadpost *.cpp,*.c,*.h call Generate_Highlighting()
 
 "language server stuff
 let g:cpp_class_scope_highlight = 1
@@ -138,8 +129,8 @@ endif
 nnoremap <F4> :CocCommand clangd.switchSourceHeader <CR>
 
 " buffer tab line
-nnoremap <C-N> :bnext <CR>
-nnoremap <C-P> :bprev <CR>
+"nnoremap <C-N> :bnext <CR>
+"nnoremap <C-P> :bprev <CR>
 
 " ctrlp
 let g:ctrlp_custom_ignore = {
@@ -154,17 +145,25 @@ let g:gruvbox_filetype_hi_groups = 1
 let g:gruvbox_plugin_hi_groups = 1
 
 
-colorscheme gruvbox8_hard
+colorscheme hybrid
+set background=dark
 
 if has('nvim')
-    lua <<EOF
+lua <<EOF
     require'nvim-treesitter.configs'.setup {
       ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
       highlight = {
         enable = true,              -- false will disable the whole extension
-        disable = { "c", "rust" },  -- list of language that will be disabled
       },
     }
+    require('telescope').setup {
+        defaults = {
+            file_ignore_patterns = {"^buid/", "^.git/", "%.so"}
+        }
+    }
+    --require('cmake').setup {
+    --    parameters_file = '.nvim.json'
+    --}
 EOF
 endif
 
@@ -280,3 +279,15 @@ nmap <silent> gp <Plug>(coc-diagnostic-next)
 
 set undodir=~/.vimdid
 set undofile
+
+let g:floaterm_keymap_toggle = '<Leader>ft'
+nnoremap <Leader>ft :FloatermToggle<CR>
+nnoremap <Leader>c :CMake build<CR>
+
+nnoremap <Leader>bb :Buffers<CR>
+nnoremap <Leader>bd :bd<CR>
+
+
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader><leader> <cmd>Telescope live_grep<cr>
+
