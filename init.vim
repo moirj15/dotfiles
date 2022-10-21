@@ -30,7 +30,7 @@ Plug 'kien/ctrlp.vim'
 Plug 'ackyshake/Spacegray.vim'
 Plug 'lifepillar/vim-gruvbox8'
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter' ", {'do': ':TSUpdate'}
 
 Plug 'rust-lang/rust.vim'
 "Plug 'puremourning/vimspector'
@@ -45,7 +45,8 @@ Plug 'Shatur/neovim-cmake'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'mfussenegger/nvim-dap'
 
-"Plug 'romgrk/barbar.nvim'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'romgrk/barbar.nvim'
 Plug 'tomasr/molokai'
 Plug 'rafi/awesome-vim-colorschemes'
 call plug#end()
@@ -55,7 +56,6 @@ syntax on
 set autoread
 
 set termguicolors
-set background=dark
 hi Normal ctermbg=none
 set autoindent
 set tabstop=4
@@ -69,13 +69,6 @@ highlight ColorColumn guibg=#2d2d2d ctermbg=4
 let NERDTreeIgnor = ['\.o']
 let g:NERDTreeWinSize=25
 set fillchars+=vert:\$
-
-let g:ale_set_highlights = 1
-let g:ale_sign_column_always=1
-let g:airline#extensions#ale#enabled=1
-let g:ale_cpp_clang_options='-std=c++2a -Wall -Wextra -pedantic -Wno-missing-braces'
-let g:ale_cpp_gcc_options='-std=c++2a -Wall -Wextra -pedantic -Wno-missing-braces'
-let g:ale_c_gcc_options='-std=c11 -Wall -Wextra -pedantic -Wno-missing-braces'
 
 set hidden
 let g:deoplete#enable_at_startup=1
@@ -145,25 +138,45 @@ let g:gruvbox_filetype_hi_groups = 1
 let g:gruvbox_plugin_hi_groups = 1
 
 
-colorscheme hybrid
-set background=dark
+colorscheme atom
+set background=light
 
 if has('nvim')
-lua <<EOF
+    lua <<EOF
     require'nvim-treesitter.configs'.setup {
-      ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+        ensure_installed = {"c", "rust", "cpp"}, 
       highlight = {
         enable = true,              -- false will disable the whole extension
       },
     }
     require('telescope').setup {
         defaults = {
-            file_ignore_patterns = {"^buid/", "^.git/", "%.so"}
+            file_ignore_patterns = {"libs","^build/", "^.git/", "%.so", "%.lib", "%.bmp", "compile_commands.json"}
         }
     }
-    --require('cmake').setup {
-    --    parameters_file = '.nvim.json'
-    --}
+require('bufferline').setup {
+    auto_hide = true,
+    exclude_ft = {'qf'},
+    insert_at_end = true,
+}
+
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  pattern = '*',
+  callback = function()
+    if vim.bo.filetype == 'nerdtree' then
+      require'bufferline.state'.set_offset(31, 'FileTree')
+    end
+  end
+})
+
+vim.api.nvim_create_autocmd('BufWinLeave', {
+  pattern = '*',
+  callback = function()
+    if vim.fn.expand('<afile>'):match('nerdtree') then
+      require'bufferline.state'.set_offset(0)
+    end
+  end
+})
 EOF
 endif
 
@@ -285,9 +298,13 @@ nnoremap <Leader>ft :FloatermToggle<CR>
 nnoremap <Leader>c :CMake build<CR>
 
 nnoremap <Leader>bb :Buffers<CR>
-nnoremap <Leader>bd :bd<CR>
-
 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader><leader> <cmd>Telescope live_grep<cr>
 
+nnoremap <leader>w <C-w>
+
+if has('win32')
+    "set shell=powershell shellquote=( shellpipe=\| shellredir=> shellxquote=
+    "set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
+endif
