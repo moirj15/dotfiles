@@ -4,8 +4,8 @@
 
 (setq inhibit-splash-screen t)
 (set-face-attribute 'default nil
-					:family "Roboto Mono"
-					:height 150
+					:family "Consolas"
+					:height 200
 					:weight 'normal
 					:width 'normal)
 
@@ -140,6 +140,7 @@
   :ensure t
   :config
   (global-git-gutter-mode))
+(setq w32-pipe-read-delay 0)
 #+end_src
 * LSP and Project Packages
 
@@ -151,14 +152,36 @@
   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
 
 (use-package lsp-ui
+  :commands lsp-ui-mode
   :ensure t
-  :config
-  (setq lsp-ui-doc-enable t)
-  ;;(setq lsp-ui-doc-show-with-cursor t)
-  (setq lsp-ui-doc-show-with-mouse t))
+  :init
+  (setq lsp-ui-doc-enable t
+        lsp-ui-doc-show-with-mouse t
+        ;lsp-ui-peek-enable t
+        lsp-ui-peek-show-directory t))
 
 (use-package dap-mode
-  :ensure t)
+  :defer
+  :config
+  (require 'dap-cpptools)
+  (setq dap-lldb-debugged-program-function (lambda () (read-file-name "Select file to debug.")))
+  ;;; default debug template for (c++)
+  (dap-register-debug-template
+   "C++ LLDB dap"
+   (list :type "cpptools"
+         :cwd nil
+         :args nil
+         :request "launch"
+         :program nil))
+  (defun dap-debug-create-or-edit-json-template ()
+    "Edit the C++ debugging configuration or create + edit if none exists yet."
+    (interactive)
+    (let ((filename (concat (lsp-workspace-root) "/launch.json"))
+	  (default "~/.emacs.d/default-launch.json"))
+      (unless (file-exists-p filename)
+	(copy-file default filename))
+      (find-file-existing filename)))
+  )
 
 (use-package counsel
   :ensure t)
@@ -193,7 +216,7 @@
 				  lsp-idle-delay 0.1)))
 (use-package treemacs
   :ensure t
-  :defer t
+  :defer t)
   
 #+end_src
 
@@ -224,12 +247,13 @@
    "bd" '(evil-delete-buffer :which-key "delete buffer")
 
    "c" '(nil :which-key "code")
-   "cd" '(lsp-ui-doc-glance :which-key "show documentation")
+   "cd" '(dap-debug :which-key "debug")
    "ce" '(lsp-treemacs-errors-list :which-key "show errors")
    "cf" '(nil :which-key "find")
    "cfd" '(lsp-ui-peek-find-definitions :which-key "find definition")
    "cfr" '(lsp-ui-peek-find-references :which-key "find references")
    "cr" '(lsp-rename :which-key "rename")
+   "csd" '(lsp-ui-doc-glance :which-key "show documentation")
    
    "f" '(nil :which-key "file")
    "fb" '(counsel-bookmark :which-key "bookmarks")
@@ -272,19 +296,6 @@
 
 * Rest
 #+BEGIN_SRC emacs-lisp
-
-
-(use-package diminish
-  :ensure t)
-
-
-
-
-
-
-;; Package for that thing that Doom and spacemaces does with the spacebar
-
-
 ;; Treesitter for syntax highlighting
 (use-package tree-sitter
   :ensure t)
@@ -356,6 +367,8 @@
 (ad-activate 'compilation-start)
 
 (provide 'only-display-compile-on-error)
+(setq c-doc-comment-style '((c-mode . doxygen)
+                            (c++-mode .doxygen)))
 
 #+end_src
 
@@ -370,3 +383,10 @@
           (lambda () (prettify-symbols-mode)))
 (add-hook 'rust-mode-hook #'lsp)
 #+end_src
+
+* Modeline
+#+BEGIN_SRC emacs-lisp
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+#+END_SRC
