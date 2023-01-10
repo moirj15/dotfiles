@@ -4,8 +4,8 @@
 
 (setq inhibit-splash-screen t)
 (set-face-attribute 'default nil
-					:family "Consolas"
-					:height 200
+					:family "DinaRemaster Regular"
+					:height 230
 					:weight 'normal
 					:width 'normal)
 
@@ -24,6 +24,7 @@
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+(scroll-bar-mode -1)
 
 (setq
  ;; Make sure the window under the mouse is the one scrolled.
@@ -220,79 +221,6 @@
   
 #+end_src
 
-* Keyboard Mapping
-
-#+begin_src emacs-lisp
-;; Shows the possible shortcut combinations 
-(use-package which-key
-  :diminish which-key-mode
-  :init
-  (which-key-mode)
-  (which-key-setup-minibuffer)
-  :ensure t
-  :config
-  (setq which-key-idle-delay 0.3
-		which-key-sort-order 'which-key-key-order-alpha))
-
-(use-package general
-  :config
-  (general-define-key
-   :states '(normal motion visual)
-   :keymaps 'override
-   :prefix "SPC"
-
-   ;; Buffers
-   "b" '(nil :which-key "buffer")
-   "bb" '(counsel-switch-buffer :which-key "switch buffers")
-   "bd" '(evil-delete-buffer :which-key "delete buffer")
-
-   "c" '(nil :which-key "code")
-   "cd" '(dap-debug :which-key "debug")
-   "ce" '(lsp-treemacs-errors-list :which-key "show errors")
-   "cf" '(nil :which-key "find")
-   "cfd" '(lsp-ui-peek-find-definitions :which-key "find definition")
-   "cfr" '(lsp-ui-peek-find-references :which-key "find references")
-   "cr" '(lsp-rename :which-key "rename")
-   "csd" '(lsp-ui-doc-glance :which-key "show documentation")
-   
-   "f" '(nil :which-key "file")
-   "fb" '(counsel-bookmark :which-key "bookmarks")
-   "ff" '(counsel-find-file :which-key "find file")
-   "fr" '(counsel-recentf :which-key "recent files")
-   "fR" '(rename-file :which-key "rename file")
-   "fs" '(save-buffer :which-key "save buffer")
-   "fS" '(evil-write-all :which-key "save all buffers")
-
-   "g" '(nil :which-key "git")
-   "gs" '(magit-status :which-key "git status")
-
-   "o" '(nil :which-key "open")
-   "os" '(eshell :which-key "open shell")
-   "of" '(make-frame :which-key "open frame")
-
-   "p" '(nil :which-key "project")
-   "pc" '(projectile-compile-project :which-key "compile project")
-   "pk" '(projectile-configure-project :which-key "configure project")
-   "psp" '(projectile-switch-project :which-key "switch project")
-   "pf" '(projectile-find-file :which-key "find file")
-   "pod" '(projectile-dired :which-key "open in dired")
-   "pr" '(projectile-run-project :which-key "run project")
-
-   ;; Windows
-   "w" '(nil :which-key "window")
-   "wN" '(make-frame :which-key "make frame")
-   "wv" '(evil-window-vsplit :which-key "vertical split")
-   "ws" '(evil-window-split :which-key "horizontal split")
-   "wd" '(evil-window-delete :which-key "delete window")
-   "wl" '(evil-window-right :which-key "evil-window-right")
-   "wh" '(evil-window-left :which-key "evil-window-left")
-   "wj" '(evil-window-down :which-key "evil-window-down")
-   "wk" '(evil-window-up :which-key "evil-window-up")
-   "wz" '(text-scale-adjust :which-key "text zoom")
-
-   )
-  :ensure t)
-#+end_src
 
 * Rest
 #+BEGIN_SRC emacs-lisp
@@ -314,6 +242,13 @@
   :ensure t
   :config (powerline-default-theme))
 (setq custom-file "~/.emacs.d/custom.el")
+(use-package neotree
+  :ensure t)
+
+(setq neo-smart-open t)
+(setq projectile-switch-project-action 'neotree-projectile-action)
+(setq neo-window-fixed-size nil)
+
 #+END_SRC
 
 * C/C++ behavior
@@ -390,3 +325,80 @@
   :ensure t
   :init (doom-modeline-mode 1))
 #+END_SRC
+
+* Keyboard Mapping
+
+#+begin_src emacs-lisp
+;; Shows the possible shortcut combinations 
+(use-package which-key
+  :diminish which-key-mode
+  :init
+  (which-key-mode)
+  (which-key-setup-minibuffer)
+  :ensure t
+  :config
+  (setq which-key-idle-delay 0.3
+		which-key-sort-order 'which-key-key-order-alpha))
+
+(use-package general
+  :config
+  (general-define-key
+   :states '(normal motion visual)
+   :keymaps 'override
+   :prefix "SPC"
+
+   ;; Buffers
+   "b" '(nil :which-key "buffer")
+   "bb" '(counsel-switch-buffer :which-key "switch buffers")
+   "bd" '(evil-delete-buffer :which-key "delete buffer")
+
+   "c" '(nil :which-key "code")
+   "cd" '(dap-debug :which-key "debug")
+   "ce" '(lsp-treemacs-errors-list :which-key "show errors")
+   "cf" '(nil :which-key "find")
+   "cfd" '(lsp-ui-peek-find-definitions :which-key "find definition")
+   "cfr" '(lsp-ui-peek-find-references :which-key "find references")
+   "cr" '(lsp-rename :which-key "rename")
+   "csd" '(lsp-ui-doc-glance :which-key "show documentation")
+   
+   "f" '(nil :which-key "file")
+   "fb" '(counsel-bookmark :which-key "bookmarks")
+   "ff" '(counsel-find-file :which-key "find file")
+   "fr" '(counsel-recentf :which-key "recent files")
+   "fR" '(rename-file :which-key "rename file")
+   "fs" '(save-buffer :which-key "save buffer")
+   "fS" '(evil-write-all :which-key "save all buffers")
+
+   "g" '(nil :which-key "git")
+   "gs" '(magit-status :which-key "git status")
+
+   "o" '(nil :which-key "open")
+   "os" '(eshell :which-key "open shell")
+   "of" '(make-frame :which-key "open frame")
+
+   "p" '(nil :which-key "project")
+   "pc" '(projectile-compile-project :which-key "compile project")
+   "pk" '(projectile-configure-project :which-key "configure project")
+   "psp" '(projectile-switch-project :which-key "switch project")
+   "pf" '(projectile-find-file :which-key "find file")
+   "pod" '(projectile-dired :which-key "open in dired")
+   "pr" '(projectile-run-project :which-key "run project")
+
+   "t" '(nil :whick-key "toggle")
+   "tn" '(neotree-toggle :which-key "toggle neo-tree")
+
+   ;; Windows
+   "w" '(nil :which-key "window")
+   "wN" '(make-frame :which-key "make frame")
+   "wv" '(evil-window-vsplit :which-key "vertical split")
+   "ws" '(evil-window-split :which-key "horizontal split")
+   "wd" '(evil-window-delete :which-key "delete window")
+   "wl" '(evil-window-right :which-key "evil-window-right")
+   "wh" '(evil-window-left :which-key "evil-window-left")
+   "wj" '(evil-window-down :which-key "evil-window-down")
+   "wk" '(evil-window-up :which-key "evil-window-up")
+   "wz" '(text-scale-adjust :which-key "text zoom")
+
+   )
+  :ensure t)
+#+end_src
