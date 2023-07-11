@@ -40,7 +40,7 @@ vim.bo.autoindent = true
 -- Color
 vim.o.termguicolors = true
 vim.cmd([[
-    colorscheme gruvbox8_hard
+    colorscheme desert
     syntax on
     filetype plugin on
 ]])
@@ -151,6 +151,7 @@ require('nvim-tree').setup{
 require('lualine').setup()
 require('nvim-autopairs').setup()
 require'lspconfig'.clangd.setup{}
+require'lspconfig'.tsserver.setup{}
 require'nvim-treesitter.configs'.setup {
     ensure_installed = { "c", "lua", "rust", "cpp" },
     highlight = {
@@ -159,7 +160,16 @@ require'nvim-treesitter.configs'.setup {
 }
 --require('popup').setup()
 --require('plenary').setup()
---require('telescope').setup()
+require('telescope').setup{
+    defaults = {
+        file_ignore_patterns = {
+            "node_modules",
+            "out",
+            ".git",
+            "libs"
+        }
+    }
+}
 --require('cmake').setup()
 --require('plenary').setup()
 --require('dap').setup()
@@ -183,11 +193,22 @@ wk.setup {
 
 wk.register({
     b = {
-        name = "buffer",
-        b = {'<cmd>Buffers<cr>', 'Buffers'},
+        name = "buffers",
+        b = {'<cmd>Telescope buffers<cr>', 'Buffers'},
+    },
+    f = {
+        name = "find",
+        f = {'<cmd>Telescope find_files<cr>', "find files"},
+        g = {'<cmd>Telescope live_grep<cr>', "live grep"},
+        b = {'<cmd>Telescope buffers<cr>', 'Buffers'},
+        r = {'<cmd>Telescope lsp_references<cr>', 'references'},
+        i = {'<cmd>Telescope lsp_implementations<cr>', 'implementations'},
+        d = {'<cmd>Telescope lsp_definitions<cr>', 'definitions'},
+        s = {'<cmd>Telescope lsp_document_symbols<cr>', 'document symbols'},
     }
 }, {prefix = '<leader>'})
 
 vim.keymap.set('n', '<leader>w', '<C-w>', {silent = true})
-
+vim.keymap.set('n', '<F10>', '<Cmd>ClangdSwitchSourceHeader<CR>', {silent = true})
+vim.keymap.set('x', 'p', "\"_dP")
 
