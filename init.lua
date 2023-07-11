@@ -152,8 +152,19 @@ require('lualine').setup()
 require('nvim-autopairs').setup()
 require'lspconfig'.clangd.setup{}
 require'lspconfig'.tsserver.setup{}
+
+vim.filetype.add({extension = {wgsl = "wgsl"}})
+
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.wgsl = {
+    install_info = {
+        url = "https://github.com/szebniok/tree-sitter-wgsl",
+        files = {"src/parser.c", "src/scanner.c"}
+    },
+}
+
 require'nvim-treesitter.configs'.setup {
-    ensure_installed = { "c", "lua", "rust", "cpp" },
+    ensure_installed = { "c", "lua", "rust", "cpp", "wgsl" },
     highlight = {
         enable = true
     }
