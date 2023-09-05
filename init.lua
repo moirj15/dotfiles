@@ -25,7 +25,7 @@ vim.o.number = true
 
 -- Clipboard
 vim.o.clipboard = "unnamedplus"
-vim.o.paste = true
+--vim.o.paste = true
 
 -- Indent Settings
 vim.o.expandtab = true
@@ -37,13 +37,6 @@ vim.o.wrap = true
 vim.o.autoindent = true
 vim.bo.autoindent = true
 
--- Color
-vim.o.termguicolors = true
-vim.cmd([[
-    colorscheme desert
-    syntax on
-    filetype plugin on
-]])
 
 -- Undo
 vim.o.undofile = true
@@ -127,8 +120,25 @@ packer.startup(function(use)
     use 'lewis6991/gitsigns.nvim'
     use 'tpope/vim-sleuth' -- Detect tabstop and shiftwidth automatically
     use 'folke/which-key.nvim'
+    use 'prettier/vim-prettier'
+    use 'josebalius/vim-light-chromeclipse'
+    use({
+        "L3MON4D3/LuaSnip",
+        -- follow latest release.
+        --tag = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+        -- install jsregexp (optional!:).
+        --run = "make install_jsregexp"
+    })
+    use 'saadparwaiz1/cmp_luasnip'
 end)
 
+-- Color
+vim.o.termguicolors = true
+vim.cmd([[
+    colorscheme hybrid_reverse
+    syntax on
+    filetype plugin on
+]])
 
 -- Automatically source and re-compile packer whenever you save this init.lua
 local packer_group = vim.api.nvim_create_augroup('Packer', { clear = true })
@@ -141,17 +151,17 @@ vim.api.nvim_create_autocmd('BufWritePost', {
 vim.cmd([[
     autocmd FileType cpp ClangFormatAutoEnable
     autocmd FileType c ClangFormatAutoEnable
+    autocmd FileType typescript ClangFormatAutoDisable
+    autocmd BufWritePre *.ts PrettierAsync
 ]])
 
 require('nvim-tree').setup{
-    --defaults = {
-     --   file_ignore_patterns = {"libs","^build/", "^.git/", "%.so", "%.lib", "%.bmp", "compile_commands.json"}
-    --}
+    defaults = {
+        file_ignore_patterns = {"libs","^build/", "^.git/", "%.so", "%.lib", "%.bmp", "compile_commands.json"}
+    }
 }
 require('lualine').setup()
 require('nvim-autopairs').setup()
-require'lspconfig'.clangd.setup{}
-require'lspconfig'.tsserver.setup{}
 
 vim.filetype.add({extension = {wgsl = "wgsl"}})
 
@@ -170,16 +180,27 @@ require'nvim-treesitter.configs'.setup {
     }
 }
 --require('popup').setup()
---require('plenary').setup()
+local actions = require("telescope.actions")
 require('telescope').setup{
     defaults = {
         file_ignore_patterns = {
-            "node_modules",
-            "out",
-            ".git",
-            "libs"
+            "node_modules/.*",
+            "out/.*",
+            ".git/.*",
+            "libs/.*",
+            "conan/.*",
+            ".vscode/.*",
+            ".idea/.*",
+            ".cmake/.*",
+            ".vs/.*",
+        },
+        mappings = {
+            i = {
+                ["<C-j>"] = actions.move_selection_next,
+                ["<C-k>"] = actions.move_selection_previous,
+            }
         }
-    }
+    },
 }
 --require('cmake').setup()
 --require('plenary').setup()
@@ -198,6 +219,47 @@ require('gitsigns').setup {
   },
 }
 
+local cmp = require('cmp')
+
+cmp.setup {
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+      end,
+    },
+    window = {
+      completion = cmp.config.window.bordered(),
+      documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' }, -- For luasnip users.
+    }, {
+      { name = 'buffer' },
+    })
+}
+
+  -- Set up lspconfig.
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  --require('lspconfig')['<YOUR_LSP_SERVER>'].setup {
+  --  capabilities = capabilities
+  --}
+require'lspconfig'.clangd.setup{
+    capabilities = capabilities
+}
+require'lspconfig'.tsserver.setup{
+    capabilities = capabilities
+}
+
 local wk = require('which-key')
 wk.setup {
 }
@@ -206,6 +268,11 @@ wk.register({
     b = {
         name = "buffers",
         b = {'<cmd>Telescope buffers<cr>', 'Buffers'},
+    },
+    l = {
+        name = "lsp",
+        d = {function() vim.lsp.buf.hover() end, 'show documentation'},
+
     },
     f = {
         name = "find",
@@ -216,10 +283,25 @@ wk.register({
         i = {'<cmd>Telescope lsp_implementations<cr>', 'implementations'},
         d = {'<cmd>Telescope lsp_definitions<cr>', 'definitions'},
         s = {'<cmd>Telescope lsp_document_symbols<cr>', 'document symbols'},
+    },
+    n = {
+        name = "nvim tree",
+        t = {'<cmd>NvimTreeToggle<cr>', 'toggle'},
+        r = {'<cmd>NvimTreeRefresh<cr>', 'refresh'},
     }
 }, {prefix = '<leader>'})
 
 vim.keymap.set('n', '<leader>w', '<C-w>', {silent = true})
 vim.keymap.set('n', '<F10>', '<Cmd>ClangdSwitchSourceHeader<CR>', {silent = true})
+vim.keymap.set('n', '<F5>', '<Cmd>FloatermToggle tm<CR>', {silent = true})
+vim.keymap.set('t', '<F5>', '<Cmd>FloatermToggle tm<CR>', {silent = true})
+vim.keymap.set('t', '<ESC>', '<C-\\><C-n>:CFloatTerm<CR>', {noremap = true, silent = true})
 vim.keymap.set('x', 'p', "\"_dP")
+vim.api.nvim_create_autocmd('LspAttach', {
+	callback = function(args)
+		vim.keymap.set('i', '<C-Space>', vim.lsp.omnifunc, {silent = true, buffer = args.buf }) 
+	end
+})
 
+vim.g.floaterm_wintype = 'split'
+vim.g.floaterm_height = 0.2
