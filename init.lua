@@ -156,8 +156,11 @@ vim.cmd([[
 ]])
 
 require('nvim-tree').setup{
-    defaults = {
-        file_ignore_patterns = {"libs","^build/", "^.git/", "%.so", "%.lib", "%.bmp", "compile_commands.json"}
+    --defaults = {
+    --    file_ignore_patterns = {"libs","^build/", "^.git/", "%.so", "%.lib", "%.bmp", "compile_commands.json"}
+    --}
+    filters = {
+        git_ignored = true,
     }
 }
 require('lualine').setup()
@@ -293,10 +296,11 @@ wk.register({
 
 vim.keymap.set('n', '<leader>w', '<C-w>', {silent = true})
 vim.keymap.set('n', '<F10>', '<Cmd>ClangdSwitchSourceHeader<CR>', {silent = true})
-vim.keymap.set('n', '<F5>', '<Cmd>FloatermToggle tm<CR>', {silent = true})
-vim.keymap.set('t', '<F5>', '<Cmd>FloatermToggle tm<CR>', {silent = true})
+--vim.keymap.set('n', '<F5>', '<Cmd>FloatermToggle tm<CR>', {silent = true})
+--vim.keymap.set('t', '<F5>', '<Cmd>FloatermToggle tm<CR>', {silent = true})
 vim.keymap.set('t', '<ESC>', '<C-\\><C-n>:CFloatTerm<CR>', {noremap = true, silent = true})
 vim.keymap.set('x', 'p', "\"_dP")
+vim.keymap.set('n', '<F5>', '<Cmd>:wa <bar> make -C ./build/Debug<CR>', {noremap = true})
 vim.api.nvim_create_autocmd('LspAttach', {
 	callback = function(args)
 		vim.keymap.set('i', '<C-Space>', vim.lsp.omnifunc, {silent = true, buffer = args.buf }) 
@@ -305,3 +309,5 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 vim.g.floaterm_wintype = 'split'
 vim.g.floaterm_height = 0.2
+
+vim.o.makeprg = "ninja"
